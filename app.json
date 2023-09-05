@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "womens-safety",
-    "slug": "womens-safety",
+    "name": "breakdown-buddy",
+    "slug": "breakdown-buddy-02",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -15,16 +15,32 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "n"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.breakdown.buddy2023"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
-  }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "3d7b98cd-3bc6-42e9-a29e-5d4af84a38d2"
+      }
+    },
+    "owner": "surajc"
+  },
+  "plugins": [
+    [
+      "expo-location",
+      {
+        "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+      }
+    ]
+  ]
 }

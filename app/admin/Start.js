@@ -1,0 +1,243 @@
+import { StyleSheet, View, Text,Image,TextInput, TouchableOpacity, ScrollView  } from 'react-native'
+import React, { Component, useEffect } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import * as Location from 'expo-location';
+import { json } from 'react-router-dom';
+// import MapView from 'react-native-maps';
+
+import axios from "axios";
+class Inputs extends Component {
+
+  constructor(props) {
+     super(props)
+     this.state = {
+      id:'',
+      search: '',
+      mechanicData: []
+    }
+
+    this.getValue();
+  }
+
+  getValue = async () => {
+
+    var value = await AsyncStorage.getItem("id");
+    this.setState({ id: value })
+    this.getMechanicsData(value);
+  }
+  
+
+
+  handleSearch = (text) => {
+    this.setState({ search: text })
+ }
+
+ SearchMechanic = (search) => {
+  console.log("Search", search)
+ }
+
+ getMechanicsData = (id) => {
+  axios.get('https://blueclans.com/breakdownbuddy/login.php?method=getMechanicData&type=admin&mech_id='+id)
+        .then((response) => {
+           if(response?.data?.response)
+           {
+              this.setState({ 
+                mechanicData : response?.data?.data
+              })
+           } else {
+              // alert("User not exits!");
+              ToastAndroid.show("Something went wrong.!", ToastAndroid.SHORT);
+           }
+        })
+        .catch(function (error) {
+           console.log(error);
+         });
+}
+
+bookBuddy = (booking_id, status) => {
+
+  axios.get('https://blueclans.com/breakdownbuddy/login.php?method=updateBooking&booking_id='+booking_id+'&status='+status)
+          .then((response) => {
+             if(response?.data?.response)
+             {
+                this.getMechanicsData(this.state.id)
+             } else {
+                // alert("User not exits!");
+                ToastAndroid.show("Something went wrong.!", ToastAndroid.SHORT);
+             }
+          })
+          .catch(function (error) {
+             console.log(error);
+           });
+
+}
+
+
+   render() {
+    const { navigation } = this.props
+
+    const pending = this.state.mechanicData['metrics']?.Pending
+    const corrent = this.state.mechanicData['metrics']?.Current
+    const completed = this.state.mechanicData['metrics']?.Completed
+
+    const mechDataList = this.state.mechanicData['data'] ? this.state.mechanicData['data'] : []
+
+    console.log("mechDataList", mechDataList)
+    var mechList = [];
+
+    if(mechDataList.length > 0)
+    {
+
+      mechList = []
+    for(let data of mechDataList){
+      mechList.push(
+          <View style={styles.listBox} key={ data['id'] }>
+              <View>
+                <Image
+                  source={require('../../assets/logo.jpg')}
+                  style={{ width: 100, height: 100 , marginTop: 30}}
+                />
+              </View>
+                <View>
+                  <Text style={{ width: 200}}><Text style={{fontWeight:'700'}}>Name</Text>: { data['name'] }</Text>
+                  <Text style={{ width: 200}}><Text style={{fontWeight:'700'}}>Mobile</Text>: { data['mobile'] }</Text>
+                  <Text style={{ width: 200}}><Text style={{fontWeight:'700'}}>Address</Text>: { data['address'] }</Text>
+                  <Text style={{ width: 200}}><Text style={{fontWeight:'700'}}>Address</Text>: { data['address'] }</Text>
+                  <Text style={{ width: 200}}><Text style={{fontWeight:'700'}}>Created On</Text>: { data['created_on'] }</Text>
+                  <Text style={{ width: 200}}><Text style={{fontWeight:'700'}}>Status</Text>: { data['status'] }</Text>
+
+                </View>
+            </View>
+      )
+  }
+
+} else {
+  mechList.push(
+    <View style={styles.listBox} key="11111111111111">
+    <View>
+      <Image
+        source={require('../../assets/logo.jpg')}
+        style={{ width: 100, height: 100 }}
+      />
+    </View>
+      <View>
+        <Text style={{marginTop: 30}}>No Data Available</Text>
+      </View>
+  </View>
+  )
+}
+
+    return (
+        <View style={styles.container}>
+            <View style={{ flexDirection: 'row', width: '100%', padding:10 }}>
+                <View style={styles.flexBox}>    
+                  <Text style={{fontSize: 13}}>Pending</Text>
+                  <Text style={{fontSize: 20, fontWeight:'700'}}>{ pending ? pending : 0 }</Text>
+                </View>
+                <View  style={styles.flexBox}>  
+                  <Text style={{fontSize: 13}}>Working</Text>
+                  <Text style={{fontSize: 20, fontWeight:'700'}}>{ corrent ? corrent : 0 }</Text>
+                </View>
+                <View  style={styles.flexBox}> 
+                  <Text style={{fontSize: 13}}>Completed</Text>
+                  <Text style={{fontSize: 20, fontWeight:'700'}}>{ completed ? completed : 0 }</Text>
+                </View>
+            </View>
+            <View style={{ padding: 20, borderTopWidth:  1, borderTopStyle:'solid', borderTopColor:'silver' , borderBottomWidth:  1, borderBottomStyle:'solid', borderBottomColor:'silver',width:'100%'}}>
+            <Text>Work List (Pending) </Text>
+            </View>
+            <ScrollView style={styles.scrollView}>
+              { mechList }
+            </ScrollView>
+        </View>
+    )
+   }
+}
+
+export default Inputs
+
+const styles = StyleSheet.create({
+    container: {
+      width: '100%',
+      flex: 1,
+      backgroundColor: 'white',
+      alignItems: 'center',
+      paddingTop: 10
+    },
+    subtext:{
+      marginTop: 20,
+    },
+    button: {
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 12,
+      paddingHorizontal: 32,
+      borderRadius: 4,
+      elevation: 3,
+      marginTop: 50,
+      backgroundColor: 'black',
+    },
+    text: {
+      fontSize: 16,
+      lineHeight: 21,
+      fontWeight: 'bold',
+      letterSpacing: 0.25,
+      color: 'white',
+    },
+    headline:{
+      marginTop: 20,
+      fontSize: 30,
+      fontWeight: 900,
+    },
+    map: {
+      width: '100%',
+      height: 200,
+      marginTop: 20,
+      marginBottom: 20
+    },
+    input: {
+      marginTop: 20,
+      margin: 15,
+      height: 40,
+      borderColor: '#7a42f4',
+      borderWidth: 1,
+      padding: 10,
+      width: '90%'
+   },
+   submitButton: {
+      backgroundColor: '#7a42f4',
+      padding: 10,
+      margin: 15,
+      height: 40,
+      textAlign: 'center',
+      width: '90%'
+   },
+   submitButtonText: {
+      color: 'white'
+   },
+   flexBox:{ 
+    flex: 1, 
+    borderWidth:  1, 
+    borderColor: 'silver', 
+    borderStyle:'solid', 
+    borderRadius:  5, 
+    width: '30%', 
+    padding: 20, 
+    margin: 5,
+    textAlign: 'left'
+  },
+  scrollView: {
+    marginHorizontal: 20,
+    width: '90%'
+  },
+  listBox: {
+    flexDirection: 'row',
+    padding: 20,
+    margin: 10,
+    width: '90%',
+    borderWidth:  1,
+    borderColor: 'silver',
+    borderStyle: 'solid'
+  }
+  });

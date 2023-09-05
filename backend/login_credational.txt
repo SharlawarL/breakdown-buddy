@@ -1,0 +1,24 @@
+1) Admin
+
+Username : admin
+Password : admin
+
+
+2) User
+Username : 9657256675
+Password : 123
+
+
+3) Mechanics
+
+Suraj
+Username : 9898989898
+Pwd : 123
+
+Mayur
+Username:  9999999999
+Pwd : 123
+
+Amar
+Username  : 8888888888
+Pwd: 123
